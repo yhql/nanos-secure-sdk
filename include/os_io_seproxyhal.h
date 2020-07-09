@@ -71,11 +71,12 @@ void io_seproxyhal_init_button(void);
 
 // delegate function for generic io_exchange
 unsigned short io_exchange_al(unsigned char channel_and_flags,
-                              unsigned short tx_len);
+                              unsigned short tx_len,
+                              unsigned char *);
 
 // Allow application to overload how the io_exchange function automatically
 // replies to get app name and version
-unsigned int os_io_seproxyhal_get_app_name_and_version(void);
+unsigned int os_io_seproxyhal_get_app_name_and_version(apdu_buffer_t*);
 
 // for delegation of Native NFC / USB
 unsigned char io_event(unsigned char channel);
@@ -89,12 +90,12 @@ void io_hal_ble_wipe_pairing_db(void);
 void USB_power(unsigned char enabled);
 
 void io_seproxyhal_handle_usb_event(void);
-void io_seproxyhal_handle_usb_ep_xfer_event(void);
+void io_seproxyhal_handle_usb_ep_xfer_event(apdu_buffer_t *);
 uint16_t io_seproxyhal_get_ep_rx_size(uint8_t epnum);
 
 // process event for io protocols when waiting for a ux operation to end
 // return 1 when event replied, 0 else
-unsigned int io_seproxyhal_handle_event(void);
+unsigned int io_seproxyhal_handle_event(apdu_buffer_t*);
 
 // reply a general status last command
 void io_seproxyhal_general_status(void);
@@ -214,7 +215,7 @@ extern u2f_service_t G_io_u2f;
  * Wait until a UX call returns a definitve status. Handle all event packets in
  * between
  */
-unsigned int os_ux_blocking(bolos_ux_params_t *params);
+// unsigned int os_ux_blocking(bolos_ux_params_t *params);
 
 /**
  * Global type that enables to map memory onto the application zone instead of
@@ -262,7 +263,7 @@ void io_task(void);
 /**
  * IO task initializez
  */
-void io_start(void);
+void io_start(apdu_buffer_t*);
 #endif // HAVE_IO_TASK
 
 void io_seproxyhal_setup_ticker(unsigned int interval_ms);
@@ -275,7 +276,7 @@ void io_seproxyhal_disable_ble(void);
  * Function to ensure a I/O channel is not timeouting waiting for operations
  * after a long time without SEPH packet exchanges
  */
-void io_seproxyhal_io_heartbeat(void);
+void io_seproxyhal_io_heartbeat(apdu_buffer_t*);
 
 #endif // OS_IO_SEPROXYHAL
 

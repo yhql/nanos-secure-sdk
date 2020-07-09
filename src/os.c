@@ -21,8 +21,6 @@
 
 #include "os_io_seproxyhal.h"
 
-// apdu buffer must hold a complete apdu to avoid troubles
-unsigned char G_io_apdu_buffer[IO_APDU_BUFFER_SIZE];
 
 
 void os_boot(void) {

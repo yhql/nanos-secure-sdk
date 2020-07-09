@@ -372,7 +372,12 @@ unsigned int pic(unsigned int linked_address);
 #else
 #define IO_APDU_BUFFER_SIZE IMPL_IO_APDU_BUFFER_SIZE
 #endif
-extern unsigned char G_io_apdu_buffer[IO_APDU_BUFFER_SIZE];
+
+typedef struct apdu_buffer_s {
+  uint8_t * buf;
+  uint16_t len;
+} apdu_buffer_t;
+
 
 #define CUSTOMCA_MAXLEN 64
 
@@ -440,6 +445,7 @@ SYSCALL REENTRANT(void halt(void));
 #define IO_FINISHED 0x08 // inter task communication value
 #define IO_FLAGS 0xF8
 unsigned short io_exchange(unsigned char channel_and_flags,
+                           apdu_buffer_t * apdu_buffer,
                            unsigned short tx_len);
 
 typedef enum {
@@ -1269,7 +1275,7 @@ SYSCALL PERMISSION(APPLICATION_FLAG_BOLOS_UX) void os_ux_read_parameters(
 // unprocessed messages are replied with a generic general status
 // when returning the application must send a general status (or continue its
 // command flow)
-unsigned int os_ux_blocking(bolos_ux_params_t *params);
+unsigned int os_ux_blocking(bolos_ux_params_t *params, apdu_buffer_t*);
 
 /* ----------------------------------------------------------------------- */
 /* -                            LIB FUNCTIONS                            - */

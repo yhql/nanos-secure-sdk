@@ -57,7 +57,8 @@ volatile unsigned int   G_io_usb_hid_remaining_length;
 volatile unsigned int   G_io_usb_hid_sequence_number;
 volatile unsigned char* G_io_usb_hid_current_buffer;
 
-io_usb_hid_receive_status_t io_usb_hid_receive (io_send_t sndfct, unsigned char* buffer, unsigned short l) {
+io_usb_hid_receive_status_t io_usb_hid_receive (io_send_t sndfct, unsigned char* buffer, unsigned short l, apdu_buffer_t * dst_buffer) 
+{
   // avoid over/under flows
   if (buffer != G_io_usb_ep_buffer) {
     os_memset(G_io_usb_ep_buffer, 0, sizeof(G_io_usb_ep_buffer));
@@ -81,14 +82,14 @@ io_usb_hid_receive_status_t io_usb_hid_receive (io_send_t sndfct, unsigned char*
       // total apdu size to receive
       G_io_usb_hid_total_length = U2BE(G_io_usb_ep_buffer, 5); //(G_io_usb_ep_buffer[5]<<8)+(G_io_usb_ep_buffer[6]&0xFF);
       // check for invalid length encoding (more data in chunk that announced in the total apdu)
-      if (G_io_usb_hid_total_length > sizeof(G_io_apdu_buffer)) {
+      if (G_io_usb_hid_total_length > dst_buffer->len) {
         goto apdu_reset;
       }
       // seq and total length
       l -= 2;
       // compute remaining size to receive
       G_io_usb_hid_remaining_length = G_io_usb_hid_total_length;
-      G_io_usb_hid_current_buffer = G_io_apdu_buffer;
+      G_io_usb_hid_current_buffer = dst_buffer->buf;
 
       // retain the channel id to use for the reply
       G_io_usb_hid_channel = U2BE(G_io_usb_ep_buffer, 0);
@@ -206,11 +207,11 @@ void io_usb_hid_sent(io_send_t sndfct) {
   }
 }
 
-void io_usb_hid_send(io_send_t sndfct, unsigned short sndlength) {
+void io_usb_hid_send(io_send_t sndfct, unsigned short sndlength, unsigned char * apdu_buffer) {
   // perform send
   if (sndlength) {
     G_io_usb_hid_sequence_number = 0; 
-    G_io_usb_hid_current_buffer = G_io_apdu_buffer;
+    G_io_usb_hid_current_buffer = apdu_buffer;
     G_io_usb_hid_remaining_length = sndlength;
     G_io_usb_hid_total_length = sndlength;
     io_usb_hid_sent(sndfct);

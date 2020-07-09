@@ -48,8 +48,6 @@ void io_usb_hid_init(void);
  * complete APDU has been received in the G_io_apdu_buffer To be called
  * typically upon USB OUT event
  */
-io_usb_hid_receive_status_t
-io_usb_hid_receive(io_send_t sndfct, unsigned char *buffer, unsigned short l);
 
 /**
  * Mark the last chunk transmitted as sent.
@@ -61,7 +59,7 @@ void io_usb_hid_sent(io_send_t sndfct);
  * Request transmission of an APDU from the G_io_apdu_buffer using the HID
  * transport protocol
  */
-void io_usb_hid_send(io_send_t sndfct, unsigned short sndlength);
+void io_usb_hid_send(io_send_t sndfct, unsigned short sndlength, unsigned char * apdu_buffer);
 
 #endif // HAVE_USB_APDU
 
