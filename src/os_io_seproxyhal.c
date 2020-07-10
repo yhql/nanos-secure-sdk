@@ -1202,8 +1202,8 @@ reply_apdu:
 
             // u2F tunnel needs the status words to be included in the signature response BLOB, do it now.
             // always return 9000 in the signature to avoid error @ transport level in u2f layers. 
-            apdu_buffer->buf[tx_len+1] = 0x90; //G_io_apdu_buffer[tx_len-2];
-            apdu_buffer->buf[tx_len] = 0x00; //G_io_apdu_buffer[tx_len-1];
+            apdu_buffer->buf[tx_len] = 0x90; //G_io_apdu_buffer[tx_len-2];
+            apdu_buffer->buf[tx_len+1] = 0x00; //G_io_apdu_buffer[tx_len-1];
             tx_len += 2;
             os_memmove(apbu_buffer->buf+5, apdu_buffer->buf, tx_len);
             // zeroize user presence and counter
@@ -1389,6 +1389,7 @@ unsigned int os_io_seph_recv_and_process(unsigned int dont_process_ux_events, ap
       }
       __attribute__((fallthrough));
 
+    default:
       // if malformed, then a stall is likely to occur
       if (io_seproxyhal_handle_event(apdu_buffer)) {
         return 1;
